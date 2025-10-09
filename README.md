@@ -23,6 +23,8 @@
 
 ## 🚀 Başlangıç / Kurulum
 Projeyi klonladıkdan ve migration işlemlerinden sonra appsetting.json  ve secret.json kısımlarında ki endpoint ve keyleri koymanız gerekmektedir.
+<br/>
 Endpoint ve keyler için;
+<br/>
 Google Auth: https://console.cloud.google.com/
 Azure AI : https://azure.microsoft.com/en-us/products/ai-foundry
