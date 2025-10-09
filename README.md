@@ -5,20 +5,31 @@
 ✨ Özellikler
 
 • Komponent bazlı interaktif yapı (sayfa/komponent bazlı)
+
 • EtkinLink Chatbotu ile etkinlik fikirleri alabilme
+
 • Google Authentication ile giriş yapma
+
 • Organizatörü değerlendirebilme
+
 • Organizatör olup etkinlik CRUD işlemleri
+
 • Blazor özelliklerini kullanarak yazılmış alert boxlar.
 
 🛠️ Kullanılan Teknolojiler
 
 • Blazor Server (.NET 9.0)
+
 • Azure Artificial Intelligence
+
 • Google Authentication
+
 • Vertical Slice Architecture
+
 • Entity Framework Core
+
 • Google Authentication
+
 • AutoMapper
 
 ## 🚀 Başlangıç / Kurulum
