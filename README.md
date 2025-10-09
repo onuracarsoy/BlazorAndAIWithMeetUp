@@ -1,8 +1,8 @@
-📌 Proje Özeti
+## 📌 Proje Özeti
 
 ...
 
-✨ Özellikler
+## ✨ Özellikler
 
 • Komponent bazlı interaktif yapı (sayfa/komponent bazlı)
 
@@ -16,7 +16,7 @@
 
 • Blazor özelliklerini kullanarak yazılmış alert boxlar.
 
-🛠️ Kullanılan Teknolojiler
+## 🛠️ Kullanılan Teknolojiler
 
 • Blazor Server (.NET 9.0)
 
