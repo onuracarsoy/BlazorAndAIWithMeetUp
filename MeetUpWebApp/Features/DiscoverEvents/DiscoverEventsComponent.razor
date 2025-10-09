@@ -1,0 +1,131 @@
+﻿@page "/"
+@using MeetUpWebApp.Features.AIChatBot
+@inject NavigationManager NavigationManager
+@inject DiscoverEventsService DiscoverEventsService
+@inject SharedHelper SharedHelper
+@inherits BaseComponent
+<h3>Etkinlikler</h3>
+
+<div class="container">
+    <div class="row g-3">
+        @if (_eventViewModels is not null && _eventViewModels.Count > 0)
+        {
+            @foreach (var item in _eventViewModels)
+            {
+
+                <div class="col-lg-3 col-md-4 col-sm-6 col-12">
+                    <a href="/events/@item.EventId" class="text-decoration-none">
+                        <div class="card border-0">
+                            <img src="@item.ImageUrl" alt="Kapak Fotoğrafı" class="rounded" />
+                            <p class=" mt-1 mb-0 small text-muted">@item.BeginDate - @item.BeginTime</p>
+                            <p class="card-title fw-bold">@item.Title</p>
+                        </div>
+                    </a>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col text-center"><p>Hiç bir etkinlik bulunamadı.</p></div>
+        }
+
+    </div>
+
+    @if (_isLoadingMoreEvents)
+    {
+        <div class="col text-center">
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        </div>
+
+    }
+    else if (_hasMoreEvents)
+    {
+        <div class="col text-center mt-5">
+         
+            <button class="btn btn-primary" @onclick="LoadEvents">Daha fazla</button>
+        </div>
+    }
+</div>
+
+@if (showFab)
+{
+    <button class="chat-fab btn btn-dark" title="Asistanı Aç" @onclick="OpenChat">
+        <i class="fa fa-commenting fa-2x"></i>
+    </button>
+}
+
+@if (showChat)
+{
+    <div class="chat-container">
+
+        <AIChatBotComponent OnClose="CloseChatFromChild" />
+    </div>
+}
+
+
+
+@code {
+    private List<EventViewModel>? _eventViewModels = new List<EventViewModel>();
+    private bool showFab = true;
+    private bool showChat = false;
+
+    private int _pageSize = 8;
+    private int _pageNumber = 1;
+    private bool _hasMoreEvents = true;
+    private bool _isLoadingMoreEvents = false;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        // initial load
+        _pageNumber = 1;
+        _hasMoreEvents = true;
+
+        await LoadEvents();
+       
+
+    }
+
+    private async Task LoadEvents()
+    {
+        if (_pageNumber == 1)
+        {
+            _isLoadingMoreEvents = false;
+        }
+        else
+        {
+            _isLoadingMoreEvents = true;
+        }
+
+        var newEvents = await DiscoverEventsService.GetEventsAsync(_pageNumber, _pageSize, SharedHelper.GetQueryParamValue("search"));
+        if (newEvents != null && newEvents.Any())
+        {
+            _eventViewModels.AddRange(newEvents);
+            _pageNumber++;
+            _hasMoreEvents = newEvents.Count == _pageSize;
+        }
+        else
+        {
+            _hasMoreEvents = false;
+        }
+
+        _isLoadingMoreEvents = false;
+    }
+
+    private void OpenChat()
+    {
+        showFab = false;
+        showChat = true;
+    }
+
+    private void CloseChat()
+    {
+        showChat = false;
+        showFab = true;
+    }
+
+    // Child component's OnClose can call this
+    private void CloseChatFromChild()
+    {
+        CloseChat();
+    }
+}

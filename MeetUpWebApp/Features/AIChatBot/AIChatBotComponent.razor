@@ -1,0 +1,154 @@
+﻿@using Microsoft.AspNetCore.Components
+@using Azure
+@using Azure.AI.OpenAI
+@using OpenAI.Chat
+@inject IJSRuntime JS
+@inject IConfiguration Configuration
+@inject AIChatBotService AIChatBotService
+
+<div class="card ai-chat-card" style="border-radius: 15px; width: 360px;">
+    <div class="card-header d-flex justify-content-between align-items-center p-2 bg-black text-white border-bottom-0"
+         style="border-top-left-radius: 15px; border-top-right-radius: 15px;">
+        <span></span>
+        <p class="mb-0 fw-bold">EtkinLink Asistan</p>
+        <button class="btn-close-custom btn btn-sm  d-flex align-items-center justify-content-center"
+                style="width: 50px; height: 40px; border: none; background-color: transparent;"
+                title="Kapat"
+                @onclick="Close">
+            <i class="fa fa-window-close fa-2x text-danger"></i>
+        </button>
+
+
+    </div>
+
+    <div id="chat-body" class="card-body overflow-auto" style="height: 320px;">
+
+        <div class="d-flex flex-row justify-content-start mb-3">
+            <img src="https://wallpapers.com/images/featured/cute-robot-png-f12plv2ofgqq6679.png"
+                 alt="avatar" style="width: 45px; height: 45px; border-radius: 50%;">
+            <div class="p-3 me-3 border bg-body-tertiary" style="border-radius: 15px; max-width: 75%;">
+                <p class="small mb-0">Merhaba, ben EtkinLink yapay zeka asistanıyım bana katılabileceğin etkinlikler hakkında sorular sorabilirsin.</p>
+            </div>
+
+        </div>
+        @foreach (var msg in messages)
+        {
+
+            if (msg.role == "user")
+            {
+                <div class="d-flex flex-row justify-content-end mb-3">
+                  
+                    <div class="p-3 ms-3" style="border-radius: 15px; background-color: rgba(57, 192, 237,.2); max-width: 75%;">
+                        <p class="small mb-0">@msg.content</p>
+                    </div>
+                    <img src="https://avatars.mds.yandex.net/i?id=ac5b0985cecdff484b5c6702f3a2f6d60f76a225-8341266-images-thumbs&n=13"
+                         alt="avatar" style="width: 45px; height: 45px; border-radius: 50%;">
+                </div>
+            }
+            else
+            {
+                <div class="d-flex flex-row justify-content-start mb-3">
+                    <img src="https://wallpapers.com/images/featured/cute-robot-png-f12plv2ofgqq6679.png"
+                         alt="avatar" style="width: 45px; height: 45px; border-radius: 50%;">
+                    <div class="p-3 me-3 border bg-body-tertiary" style="border-radius: 15px; max-width: 75%;">
+                        <p class="small mb-0">@msg.content</p>
+                    </div>
+                
+                </div>
+            }
+        }
+
+        
+    </div>
+
+    <div class="card-footer p-2">
+        <div class="form-outline mb-2">
+            <textarea class="form-control bg-body-tertiary" id="textAreaExample" @bind="userMessage.content" rows="1" placeholder="Sorunuzu yazın..."></textarea>
+        </div>
+
+        <div class="d-flex justify-content-end">
+            <button class="btn btn-outline-success" @onclick="SendMessageAsync" disabled="@isSending">
+                @if (isSending)
+                {
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                }
+                Gönder
+            </button>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback OnClose { get; set; }
+
+    private List<AIChatbotViewModel> messages = new List<AIChatbotViewModel>();
+    private AIChatbotViewModel userMessage = new AIChatbotViewModel();
+
+
+    private bool isSending = false;
+
+    private async Task SendMessageAsync()
+    {
+        if (string.IsNullOrWhiteSpace(userMessage.content))
+            return;
+
+        // Add user message to UI
+        var userMsg = new AIChatbotViewModel { role = "user", content = userMessage.content };
+        messages.Add(userMsg);
+
+        // Clear input for user and render
+        var userText = userMessage.content;
+        userMessage.content = string.Empty;
+        StateHasChanged();
+
+        // Scroll to bottom after adding user's message
+        await ScrollToBottomAsync();
+
+        // Call AI and add assistant response
+        isSending = true;
+        StateHasChanged();
+        try
+        {
+            var assistantText = await AIChatBotService.GetAiResponseAsync(userText);
+            messages.Add(new AIChatbotViewModel { role = "assistant", content = assistantText ?? "(No response)" });
+
+            StateHasChanged();
+            await ScrollToBottomAsync();
+        }
+        finally
+        {
+            isSending = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task Close()
+    {
+        if (OnClose.HasDelegate)
+        {
+            await OnClose.InvokeAsync(null);
+        }
+    }
+
+    private async Task ScrollToBottomAsync()
+    {
+        await JS.InvokeVoidAsync("blazorExtensions.scrollToBottom", "chat-body");
+    }
+}
+<script>
+    window.blazorExtensions = {
+        scrollToBottom: function (elementId) {
+            try {
+                const el = document.getElementById(elementId);
+                if (!el) return;
+                // small delay to ensure DOM updated
+                setTimeout(function () {
+                    el.scrollTop = el.scrollHeight;
+                }, 50);
+            } catch (e) {
+                console && console.warn && console.warn("scrollToBottom failed", e);
+            }
+        }
+    };
+</script>

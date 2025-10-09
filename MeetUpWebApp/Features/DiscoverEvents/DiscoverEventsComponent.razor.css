@@ -1,0 +1,34 @@
+﻿.chat-fab {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    width: 64px;
+    height: 64px;
+    border-radius: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.chat-container {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 2000;
+    width: 360px;
+}
+
+.chat-close-overlay {
+    position: absolute;
+    right: 8px;
+    top: -10px;
+    z-index: 2010;
+    border-radius: 50%;
+    padding: 6px 8px;
+}
+
+.chat-container .ai-chat-card {
+    width: 360px;
+}

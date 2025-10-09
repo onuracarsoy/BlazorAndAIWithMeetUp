@@ -1,0 +1,13 @@
+﻿@page "/rsvp-error/{eventId:int}"
+
+<ErrorMessageComponent errorMessage="Bir hata oluştu."/>
+<br />
+<a class="btn btn-primary" href="/events/@eventId">Ana Sayfa</a>
+
+
+@code {
+    [Parameter]
+    public int eventId { get; set; }
+
+
+}

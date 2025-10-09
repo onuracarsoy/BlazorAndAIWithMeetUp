@@ -1,0 +1,96 @@
+﻿
+@inject IAuthenticationSchemeProvider AuthenticationService
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject RSVPEventService RSVPEventService
+
+
+@if (eventViewModel is not null)
+{
+    <footer class="container-fluid bg-dark text-white py-2 position-fixed bottom-0 w-100">
+        <div class="container d-flex justify-content-between align-items-center">
+            <div>
+                <strong>Tarih ve Saat:</strong> @eventViewModel.BeginDate @eventViewModel.BeginTime - @eventViewModel.EndDate @eventViewModel.EndTime
+            </div>
+            <div>
+                <strong>Kontenjan:</strong> @(eventViewModel.Capacity == 0 ? "Sınırsız" : eventViewModel.Capacity.ToString())
+            </div>
+            <div class="alert">
+                @errorMessage
+            </div>
+            <div>
+                @if(!userRSVPStatus)
+                {
+                    <button class="btn btn-outline-success" @onclick="Attend">Katıl</button>
+                }
+                else
+                {
+                    <span class="badge bg-success">Etkinliğe Katıldınız</span>
+                }
+            </div>
+        </div>
+
+
+    </footer>
+
+    <DialogComponent Title="Etkinliğe katılmak için giriş yapınız." @ref="dialog">
+        <DialogBody>
+            <ExternalLoginButtonsComponent />
+        </DialogBody>
+    </DialogComponent>
+
+    <ConfirmDialogComponent @ref="confirmDialog" />
+}
+
+
+@code {
+        [Parameter]
+        public EventViewModel? eventViewModel { get; set; }
+
+    private DialogComponent? dialog;
+
+    private AuthenticationState? authenticationState;
+
+    private ConfirmDialogComponent? confirmDialog;
+
+    private bool userRSVPStatus;
+
+    private string errorMessage = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        userRSVPStatus = await RSVPEventService.CheckUserRSVPStatusAsync(eventViewModel?.EventId, authenticationState?.User?.FindFirst(c => c.Type == ClaimTypes.Email)?.Value);
+
+    }
+
+    private void Attend()
+    {
+        if (authenticationState is not null && (authenticationState?.User?.Identity?.IsAuthenticated ?? false) == false)
+        {
+            dialog?.Show();
+
+        }
+        else
+        {
+            confirmDialog?.Show("Etkinliğe katılmak istediğinize emin misiniz?",ConfirmDialogEnum.YesNo,async () =>
+            {
+                var response = await RSVPEventService.RSVPToEventAsync(eventViewModel.EventId, authenticationState?.User?.FindFirst(c => c.Type == ClaimTypes.Email)?.Value);
+                if (response)
+                {
+                    NavigationManager.NavigateTo($"/events/{eventViewModel.EventId}");
+                }
+                else
+                {
+                    confirmDialog?.Show("Etkinliğe katılırken bir hata oluştu, lütfen daha sonra tekrar deneyiniz.", ConfirmDialogEnum.OkCancel, () =>
+                    {
+                        NavigationManager.NavigateTo($"/events/{eventViewModel.EventId}", true);
+                    });
+                }
+
+            });
+        }
+
+
+    }
+}

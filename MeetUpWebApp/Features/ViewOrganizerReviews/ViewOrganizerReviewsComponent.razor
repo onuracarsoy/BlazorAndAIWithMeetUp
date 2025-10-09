@@ -1,0 +1,51 @@
+﻿@page "/org/{organizerId:int}/reviews"
+@inject ViewOrganizerReviewsService ViewOrganizerReviewsService
+
+<h3> @organizer?.Name adlı organizatörün değerlendirmeleri.</h3>
+<div class="d-flex justify-content-center mb-3">
+    <a class="btn btn-primary" href="/org/@organizerId/leave-review">Değerlendir </a>
+</div>
+
+@if (reviews is not null)
+{
+    <div class="container">
+        <div class="row">
+            @foreach (var item in reviews)
+            {
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h6 class="card-subtitle text-muted">@item.ReviewerUser.Name</h6>
+                        <div class="stars">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <span class="star @(i <= item.Rating ? "selected" : "")">&#9733;</span>
+                            }
+                        </div>
+                        <p class="card-text mt-2">@item.ReviewText</p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+else
+{
+    <div class="text-center py-4">
+        <div class="spinner-border text-primary" role="status"></div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int organizerId { get; set; }
+
+    private User? organizer;
+
+    private List<OrganizerReview>? reviews;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        organizer = await ViewOrganizerReviewsService.GetUserByIdAsync(organizerId);
+        reviews = await ViewOrganizerReviewsService.GetOrganizerReviewsAsync(organizerId);
+    }
+}

@@ -1,0 +1,54 @@
+﻿
+@inherits LayoutComponentBase
+@inject LayoutService layoutService
+@implements IDisposable
+
+<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-3 ">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">EtkinLink</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <SearchBarComponent SearchUrl="/" />
+        </div>
+      <BecomeOrganizerComponent/>
+        <LoginStatusComponent />
+    </div>
+</nav>
+<main class="container mx-auto">
+    
+    @Body
+</main>
+
+<div style="margin-bottom:100px;">
+    @layoutService.SectionContent
+</div>
+
+
+
+<div id="blazor-error-ui" data-nosnippet>
+    An unhandled error has occurred.
+    <a href="." class="reload">Reload</a>
+    <span class="dismiss">🗙</span>
+</div>
+
+@code {
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            layoutService.OnContentChanged += UpdateLayoutSection;
+        }
+    }
+
+    private async void UpdateLayoutSection()
+    {
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        layoutService.OnContentChanged -= UpdateLayoutSection;
+    }
+}

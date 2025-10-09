@@ -1,0 +1,57 @@
+﻿@page "/org/events/create"
+@inject SharedHelper sharedHelper
+@inject CreateEventService createEventService
+@inject NavigationManager navigationManager
+@inherits BaseComponent
+@attribute [Authorize(policy:"OrganizerOnly")]
+<div class="container my-4">
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h3 class="mb-0">Etkinlik Oluştur</h3>
+        </div>
+
+        <div class="card-body">
+            <AddUpdateEventComponent _eventViewModel="@_eventViewModel"  OnSaved="CreateEvent"  errorMessage="@errorMessage">
+     
+                <errorMessageFragment>
+                    <ErrorMessageComponent ErrorMessage="@errorMessage" />
+                </errorMessageFragment>
+
+            </AddUpdateEventComponent>
+
+        </div>
+    </div>
+</div>
+
+@code {
+    /// <summary>
+    /// Form tarafından bağlanan Event view model. Yeni etkinlik verileri burada toplanır.
+    /// </summary>
+    private EventViewModel _eventViewModel = new EventViewModel();
+
+    /// <summary>
+    /// Kullanıcıya gösterilecek genel hata mesajı.
+    /// </summary>
+    private string? errorMessage = string.Empty;
+
+    /// <summary>
+    /// Form geçerliyse çağrılır; servise yeni etkinlik oluşturma isteği gönderir ve anasayfaya yönlendirir.
+    /// </summary>
+    private async Task CreateEvent()
+    {
+        errorMessage = _eventViewModel.Validate();
+        if (!string.IsNullOrWhiteSpace(errorMessage))
+        {
+            return;
+        }
+
+
+
+        _eventViewModel.OrganizerId = int.Parse(base.UserId);
+        await createEventService.CreateEventAsync(_eventViewModel);
+        StateHasChanged();
+        navigationManager.NavigateTo("/org/events");
+    }
+
+
+}

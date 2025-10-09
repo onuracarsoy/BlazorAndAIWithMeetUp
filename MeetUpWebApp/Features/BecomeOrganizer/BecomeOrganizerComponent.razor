@@ -1,0 +1,49 @@
+﻿@inherits BaseComponent
+@inject NavigationManager NavigationManager
+
+@if (base.IsOrganizer)
+{
+    <ul class="navbar-nav ms=auto me-4">
+        <li class="nav-item">
+            <a class="nav-link btn btn-primary" href="/org/events">Etkinlikleri Yönet</a>
+        </li>
+    </ul>
+}
+else
+{
+    @if (IsAuthenticated)
+    {
+        <ul class="navbar-nav ms=auto me-4">
+            <li class="nav-item">
+                <a class="nav-link btn btn-primary" @onclick="BecomeOrganizer">Organizatör Ol</a>
+            </li>
+        </ul>
+        <DialogComponent Title="Giriş Yap" @ref="loginDialog">
+            <DialogBody>
+                <ExternalLoginButtonsComponent IsForOrganizer="true" />
+            </DialogBody>
+        </DialogComponent>
+    }
+
+}
+
+
+
+@code {
+
+    private DialogComponent? loginDialog;
+
+    private void BecomeOrganizer()
+    {
+        if(base.IsAuthenticated == false)
+        {
+            loginDialog?.Show();
+        }
+        else
+        {
+            NavigationManager.NavigateTo($"/signin-callback/organizer",true);
+           
+        }
+    }
+   
+}

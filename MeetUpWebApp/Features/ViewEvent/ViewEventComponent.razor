@@ -1,0 +1,67 @@
+﻿@page "/events/{eventId:int}"
+@inject ViewEventService viewEventService
+@inject LayoutService layoutService
+
+@if (eventViewModel is not null)
+{
+    <h2>@eventViewModel.Title</h2>
+    <OrganizerAverageReviewsComponent organizerId="eventViewModel.OrganizerId" />
+    <hr />
+    <p>
+        <img src="@eventViewModel.ImageUrl" alt="Kapak Fotoğrafı" class="rounded" style="width:500px" />
+    </p>
+    <br />
+
+    <h6>Ayrıntılar</h6>
+    <div class="padding-bottom:100px;">
+        <pre style="white-space: pre-wrap; word-wrap:break-word; ">
+                @eventViewModel.Description
+            </pre>
+
+    </div>
+    <br />
+    <h6>Bilet</h6>
+
+    @if (eventViewModel.HasCost)
+    {
+        <p class="text-success">Fiyat : @eventViewModel.TicketPrice.Value.ToString("c")</p>
+    }
+    else
+    {
+        <p class="badge bg-success">Bu etkinlik ücretsiz.</p>
+    }
+    <br />
+    <h6>Tür</h6>
+    <p> @((eventViewModel.Category == MeetupCategoriesEnum.InPerson.ToString()) ? "Yüzyüze" : "Çevrimçi")</p>
+    <br />
+    <h6>Lokasyon / Link</h6>
+    <p>@((eventViewModel.Category == MeetupCategoriesEnum.InPerson.ToString()) ? eventViewModel.Location :  eventViewModel.MeetupLink)</p>
+    <hr />
+    <AttendeesComponent Users="_users" />
+    <br />
+    <hr />
+    <LeaveEventCommentsComponent eventViewModel="this.eventViewModel" />
+}
+else
+{
+    <p>Etkinlik bulunamadı.</p>
+}
+
+@code {
+    [Parameter]
+    public int eventId { get; set; }
+
+    private EventViewModel? eventViewModel;
+
+    private List<User?>? _users { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        eventViewModel = await viewEventService.GetEventByIdAsync(eventId);
+        _users = await viewEventService.GetAttendeesByEventIdAsync(eventId);
+
+        layoutService.SetSectionContent(@<RSVPEventFooterComponent eventViewModel="eventViewModel" />);
+    }
+
+
+}

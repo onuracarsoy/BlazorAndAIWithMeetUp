@@ -1,0 +1,67 @@
+﻿@page "/org/events"
+@inject ViewCreatedEventService viewCreatedEventService
+@inherits BaseComponent
+@attribute [Authorize(policy: "OrganizerOnly")]
+<h3>Oluşturduğum Etkinlikler</h3>
+
+@if (createdEvents is not null && createdEvents.Count > 0)
+{
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+
+                <th>Sil</th>
+                <th>Düzenle</th>
+                <th>Etkinlik Başlığı</th>
+                <th>Başlangıç Tarihi / Zamanı</th>
+                <th>Bitiş Tarihi / Zamanı</th>
+                <th>Kontenjan</th>
+
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in createdEvents)
+            {
+
+                <tr>
+                    <td><DeleteEventComponent _eventViewModel="item" /></td>
+                    <td><a class="btn btn-warning" href="/org/events/edit/@item.EventId">Düzenle</a></td>
+                    <td>
+                        <img src="@item.ImageUrl" alt="Kapak Fotoğrafı" style="max-width: 100px; max-height: 59px; margin-top:10px;" />
+                        <br>
+                        @item.Title
+                    </td>
+                    <td>@item.BeginDate  @item.BeginTime</td>
+                    <td>@item.EndDate  @item.EndTime</td>
+                    <td>@((item.Capacity == 0) ? "Limitsiz" : item.Capacity.ToString())</td>
+                </tr>
+
+            }
+        </tbody>
+    </table>
+
+}
+
+
+
+
+<a class="btn btn-success" href="/org/events/create">Etkinlik Oluştur</a>
+
+
+
+@code {
+    private List<EventViewModel> createdEvents = new List<EventViewModel>();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            createdEvents = await viewCreatedEventService.GetEventsCreatorIdAsync(base.UserId);
+            StateHasChanged();
+        }
+    }
+
+
+}

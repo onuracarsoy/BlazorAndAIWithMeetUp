@@ -1,0 +1,50 @@
+﻿@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inherits BaseComponent
+
+<ul class="navbar-nav ms=auto">
+    @if (base.IsAuthenticated)
+    {
+        <li class="nav-item">
+            <a class="nav-link text-light" href="/users/@base.UserId/manage-rsvp-events">Merhaba, @base.UserName</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" @onclick="Logout">Çıkış Yap</a>
+        </li>
+    }
+    else
+    {
+        <li class="nav-item">
+            <a class="nav-link" @onclick="Login">Giriş Yap</a>
+        </li>
+    }
+</ul>
+
+<DialogComponent Title="Giriş Yap" @ref="loginDialog">
+    <DialogBody>
+        <ExternalLoginButtonsComponent />
+    </DialogBody>
+</DialogComponent>
+
+@code {
+
+    private DialogComponent? loginDialog;
+
+ 
+
+    private void Login()
+    {
+        if(base.IsAuthenticated is false)
+        {
+            loginDialog?.Show();
+        }
+    }
+
+
+    private void Logout()
+    {
+        NavigationManager.NavigateTo("/signout", true);
+    }
+
+
+}

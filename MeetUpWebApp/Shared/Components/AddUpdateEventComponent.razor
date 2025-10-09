@@ -1,0 +1,211 @@
+﻿@inject SharedHelper sharedHelper
+
+@if (_eventViewModel is not null)
+{
+
+        <EditForm Model="_eventViewModel" OnValidSubmit="Save" OnInvalidSubmit="()=> {this.errorMessage = string.Empty;}">
+            <DataAnnotationsValidator />
+            <div class="row g-3">
+                <div class="col-md-8">
+                    <label for="title" class="form-label">Etkinlik Başlığı</label>
+                    <InputText id="title" class="form-control" @bind-Value="_eventViewModel.Title" />
+                    <ValidationMessage For="@(() => _eventViewModel.Title)" />
+                </div>
+
+                <div class="col-md-4">
+                    <label for="capacity" class="form-label">Etkinlik Kontenjanı</label>
+                    <InputNumber id="capacity" class="form-control" @bind-Value="_eventViewModel.Capacity" />
+                    <ValidationMessage For="@(() => _eventViewModel.Capacity)" />
+                </div>
+
+                <div class="col-12">
+                    <label for="description" class="form-label">Etkinlik Açıklaması</label>
+                    <InputTextArea id="description" class="form-control" rows="4" @bind-Value="_eventViewModel.Description" />
+                    <ValidationMessage For="@(() => _eventViewModel.Description)" />
+                </div>
+
+                <div class="col-md-6">
+                    <label for="beginDate" class="form-label">Etkinlik Başlangıç Tarihi</label>
+                    <InputDate id="beginDate" class="form-control" @bind-Value="_eventViewModel.BeginDate" />
+                    <ValidationMessage For="@(() => _eventViewModel.BeginDate)" />
+                </div>
+                <div class="col-md-6">
+                    <label for="beginTime" class="form-label">Etkinlik Başlangıç Saati</label>
+                    <input type="time" id="beginTime" class="form-control" @bind-value="_eventViewModel.BeginTime" />
+                    <ValidationMessage For="@(() => _eventViewModel.BeginTime)" />
+                </div>
+
+                <div class="col-md-6">
+                    <label for="endDate" class="form-label">Etkinlik Bitiş Tarihi</label>
+                    <InputDate id="endDate" class="form-control" @bind-Value="_eventViewModel.EndDate" />
+                    <ValidationMessage For="@(() => _eventViewModel.EndDate)" />
+                </div>
+                <div class="col-md-6">
+                    <label for="endTime" class="form-label">Etkinlik Bitiş Saati</label>
+                    <input type="time" id="endTime" class="form-control" @bind-value="_eventViewModel.EndTime" />
+                    <ValidationMessage For="@(() => _eventViewModel.EndTime)" />
+                </div>
+
+                <div class="col-md-6">
+                    <label for="category" class="form-label">Etkinlik Türü</label>
+                    <InputSelect id="category" class="form-select" @bind-Value="_eventViewModel.Category">
+                        <option value="">-- Etkinlik Türü Seçin --</option>
+                        @foreach (var item in sharedHelper.GetCategories())
+                        {
+                            <option value="@item">@((item == MeetupCategoriesEnum.InPerson.ToString()) ? "Yüzyüze" : "Çevrimçi")</option>
+                        }
+                    </InputSelect>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="coverImage" class="form-label">
+                        <i class="bi bi-image me-1"></i> Kapak Fotoğrafı
+                    </label>
+                    <InputFile id="coverImage" class="form-control" OnChange="HandleImageUpload" accept="png" />
+                    <div class="form-text">PNG veya JPEG. Maksimum boyut proje kısıtlarına göre kontrol edilir.</div>
+                    <ValidationMessage For="@(() => _eventViewModel.CoverImage)" />
+                @if (_eventViewModel.ImageUrl is not null)
+                {
+                    <div class="col-12">
+                        <img src="@_eventViewModel.ImageUrl" alt="Kapak Fotoğrafı" class="img-thumbnail mt-2" style="max-width: 300px;" />
+                    </div>
+                }
+                </div>
+
+            
+
+                @if (_eventViewModel.Category == MeetupCategoriesEnum.InPerson.ToString())
+                {
+                    <div class="col-12">
+                        <label for="location" class="form-label">
+                            <i class="bi bi-geo-alt me-1"></i> Etkinlik Lokasyonu
+                        </label>
+                        <InputTextArea id="location" class="form-control" rows="2" @bind-Value="_eventViewModel.Location" />
+                        <ValidationMessage For="@(() => _eventViewModel.Location)" />
+                    </div>
+                }
+                else if (_eventViewModel.Category == MeetupCategoriesEnum.Online.ToString())
+                {
+                    <div class="col-12">
+                        <label for="meetupLink" class="form-label">
+                            <i class="bi bi-link-45deg me-1"></i> Etkinlik Linki
+                        </label>
+                        <InputText id="meetupLink" class="form-control" @bind-Value="_eventViewModel.MeetupLink" />
+                        <ValidationMessage For="@(() => _eventViewModel.MeetupLink)" />
+                    </div>
+                }
+
+            <div class="col-md-12">
+                <label for="hasCost" class="form-label">Biletli Etkinlik</label>
+                <InputCheckbox  class="form-check-input" @bind-value="_eventViewModel.HasCost" />
+                @if (_eventViewModel.HasCost)
+                {
+                    <div class="col-md-6">
+                        <label for="ticketPrice" class="form-label">Bilet Fiyatı</label>
+                        <InputNumber id="ticketPrice" class="form-control" @bind-value="_eventViewModel.TicketPrice" />
+                        <ValidationMessage For="@(() => _eventViewModel.TicketPrice)" />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="refundable" class="form-label">İade edilemez/edilebilir</label>
+                        <InputCheckbox id="refundable" class="form-check-input" @bind-value="_eventViewModel.Refundable" />
+                        <ValidationMessage For="@(() => _eventViewModel.Refundable)" />
+                    </div>
+                }
+
+            </div>
+            </div>
+
+         
+
+            <div class="mt-4 d-flex justify-content-end gap-2 align-items-center">
+                @if (errorMessageFragment is not null)
+                {
+                    @errorMessageFragment
+                }
+            @if(_eventViewModel.EventId == 0)
+            {
+                <button type="submit" class="btn btn-success">Oluştur</button>
+            }
+            else
+            {
+                <button type="submit" class="btn btn-warning">Güncelle</button>
+            }
+
+            <a class="btn btn-danger" href="/org/events">İptal</a>
+            </div>
+        </EditForm>
+
+}
+
+
+@code {
+    [Parameter]
+    public EventViewModel? _eventViewModel { get; set; }
+
+    [Parameter]
+    public string? errorMessage { get; set; }
+
+    [Parameter]
+    public RenderFragment? errorMessageFragment { get; set; }
+
+    [Parameter]
+    public EventCallback<EventViewModel?> OnSaved { get; set; }
+
+    private async Task Save()
+    {
+        await OnSaved.InvokeAsync(this._eventViewModel);
+    }
+
+    /// <summary>
+    /// Kullanıcının seçtiği kapak fotoğrafını işler: dosyayı okur, yeniden boyutlandırır ve wwwroot altında kaydeder.
+    /// Hata durumunda errorMessage ayarlanır.
+    /// </summary>
+    /// <param name="e">InputFile değişim event argümanı</param>
+    private async Task HandleImageUpload(InputFileChangeEventArgs e)
+    {
+        if (this._eventViewModel == null) return;
+
+        try
+        {
+            IBrowserFile file = e.File;
+
+            if (file == null)
+            {
+                errorMessage = "Fotoğraf seçilemedi!";
+                return;
+            }
+
+            // Validate the image size to make sure the image size is less than 500 KB.
+            if (file.Size > 500 * 1024)
+            {
+                
+                errorMessage = "Fotoğraf boyutu 500KB aşmamalıdır..";
+                return;
+            }
+
+            this._eventViewModel.CoverImage = file;
+
+            // Generate a unqiue file name
+            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(_eventViewModel.CoverImage.Name);
+            var filePath = Path.Combine("wwwroot", "images", "events", fileName);
+
+            // Resize the image
+            using var stream = _eventViewModel.CoverImage.OpenReadStream();
+            using var image = await SixLabors.ImageSharp.Image.LoadAsync(stream);
+            image.Mutate(x => x.Resize(300, 169));
+
+            // Save the image
+            using var fileStream = new FileStream(filePath, FileMode.Create);
+            await image.SaveAsync(fileStream, new SixLabors.ImageSharp.Formats.Png.PngEncoder());
+
+            // Set the image url
+            _eventViewModel.ImageUrl = $"/images/events/{fileName}";
+
+            errorMessage = string.Empty;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error uploading image: {ex.Message}";
+        }
+    }
+}

@@ -1,0 +1,159 @@
+﻿@page "/org/{organizerId:int}/leave-review"
+@inject LeaveReviewService LeaveReviewService
+@inherits BaseComponent
+@attribute [Authorize]
+@inject NavigationManager navigationManager
+@if (base.IsAuthenticated)
+{
+
+
+<div class="card shadow-sm p-4 mb-4">
+
+<h3>@organizer?.Name adlı organizatörü değerlendir.</h3>
+<hr class="mb-4" />
+
+
+
+
+                    
+            
+        @if (showSuccessMessage)
+    {
+        <div class="alert alert-success">
+            <div>Geri dönüşünleriniz için teşekkür ederiz!</div>
+           
+        </div>
+        <a href="/" class="btn btn-primary">Etkinliklere dön</a>
+    }
+    else if (showErrorMessage)
+    {
+        <div class="alert alert-danger">
+            <div>Değerlendirme yapılırken bir hata oluştu. Lütfen daha sonra tekrar deneyin.</div>
+          
+        </div>
+        <a href="/" class="btn btn-primary">Etkinliklere dön</a>
+    }
+    else
+    {
+
+    <EditForm Model="newReview" OnValidSubmit="@HandleReviewSubmission">
+        <DataAnnotationsValidator />
+        <div class="mb-3">
+            <label for="rating" class="form-label d-block">Değerlendirmeniz</label>
+            <div id="rating" class="flex-md-column align-items-center">
+                @for (int i = 1; i <= 5; i++)
+                {
+                    int starIndex = i;
+                    <span class="star @(i <= newReview.Rating ? "selected" : "")
+                                      @(i <= HoverRating ? "hovered-star" : "")"
+                          @onclick="() => SetRating(starIndex)"
+                          @onmouseover="() => OnStarHover(starIndex)"
+                          @onmouseout="OnStarMouseOut">
+                        &#9733;
+                    </span>
+
+                }
+                <ValidationMessage For="@(() => newReview.Rating)" class="text-danger" />
+            </div>
+
+
+        </div>
+        <div class="mb-3">
+            <label for="reviewText" class="form-label">Düşünceleriniz (Opsiyonel)</label>
+            <InputTextArea id="reviewText" class="form-control" @bind-Value="newReview.ReviewText" rows="5" placeholder="Organizatör hakkındaki düşüncelerinizi paylaşın." />
+            <ValidationMessage For="@(() => newReview.ReviewText)" />
+
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg">Gönder</button>
+    </EditForm>
+    }
+</div>
+
+
+}
+
+@code {
+    [Parameter]
+    public int organizerId { get; set; }
+
+    private User? organizer;
+
+    private OrganizerReview newReview = new OrganizerReview();
+
+    private int HoverRating;
+
+    private bool showSuccessMessage = false;
+
+    private bool showErrorMessage = false;
+
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (base.IsAuthenticated)
+        {
+            organizer = await LeaveReviewService.GetUserByIdAsync(organizerId);
+
+            newReview = new OrganizerReview
+            {
+                OrganizerId = organizerId,
+                ReviewerUserId = int.Parse(base.UserId)
+            };
+        }
+        else
+        {
+            navigationManager.Refresh();
+        }
+
+    }
+
+
+    private async Task HandleReviewSubmission()
+    {
+        newReview.ReviewDate = DateTime.Now;
+        try
+        {
+            if (await LeaveReviewService.ReviewOrganizerAsync(newReview))
+            {
+                showSuccessMessage = true;
+                showErrorMessage = false;
+            }
+            else
+            {
+                showSuccessMessage = false;
+                showErrorMessage = true;
+            }
+
+            newReview = new OrganizerReview
+            {
+                OrganizerId = organizerId,
+                ReviewerUserId = int.Parse(base.UserId)
+            };
+
+            HoverRating = 0;
+
+        }
+        catch (Exception ex)
+        {
+            showSuccessMessage = false;
+            showErrorMessage = true;
+        }
+
+    }
+
+    private void SetRating(int rating)
+    {
+        newReview.Rating = rating;
+        HoverRating = rating;
+    }
+
+    private void OnStarHover(int rating)
+    {
+        HoverRating = rating;
+    }
+
+    private void OnStarMouseOut()
+    {
+        HoverRating = newReview.Rating;
+    }
+}

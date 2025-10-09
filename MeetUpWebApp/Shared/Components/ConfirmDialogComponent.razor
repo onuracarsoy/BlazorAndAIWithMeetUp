@@ -1,0 +1,60 @@
+﻿@if(isVisible)
+{
+    <div class="modal model-backdrop show d-block" tabindex="-1" style="background-color:rgba(0,0,0,0.5)">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-danger">Uyarı!</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>@confirmMessage</p>
+                </div>
+                <div class="modal-footer">
+                    @if (buttonType == ConfirmDialogEnum.YesNo)
+                    {
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @onclick="Close">Vazgeç</button>
+                        <button type="button" class="btn btn-success" @onclick="Confirm">Onaylıyorum</button>
+                    }
+                    else if (buttonType == ConfirmDialogEnum.OkCancel)
+                    {
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @onclick="Close">Tamam</button>
+                    }
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+@code {
+    private bool isVisible = false;
+    private string? confirmMessage;
+    private Action? onConfirm;
+    private ConfirmDialogEnum buttonType;
+
+    public void Show(string message, ConfirmDialogEnum buttonType, Action onConfirm)
+    {
+        this.onConfirm = onConfirm;
+        isVisible = true;
+        confirmMessage = message;
+        this.buttonType = buttonType;
+        StateHasChanged();
+    }
+
+    private void Close()
+    {
+        isVisible = false;
+        confirmMessage = string.Empty;
+    }
+
+    private void Confirm()
+    {
+        isVisible = false;
+        confirmMessage = string.Empty;
+
+        onConfirm?.Invoke();
+    }
+    
+}

@@ -1,0 +1,38 @@
+﻿@inject DeleteEventService deleteEventService
+@inject NavigationManager navigationManager
+@inherits BaseComponent
+@attribute [Authorize(policy: "OrganizerOnly")]
+<button class="btn btn-danger mt-3" @onclick="DeleteEvent">Etkinliği Sil</button>
+<ErrorMessageComponent ErrorMessage="@errorMessage" />
+
+<ConfirmDialogComponent @ref="confirmDialogComponent" />
+
+@code {
+
+    [Parameter]
+    public EventViewModel? _eventViewModel { get; set; }
+
+    private string? errorMessage = string.Empty;
+
+    private ConfirmDialogComponent? confirmDialogComponent;
+
+
+    private void DeleteEvent()
+    {
+        confirmDialogComponent?.Show($"'{_eventViewModel?.Title}' adlı etkinliği silmek istediğinize emin misiniz? Bu işlem geri alınamaz.", ConfirmDialogEnum.YesNo,async () =>
+        {
+            StateHasChanged();
+            if(await deleteEventService.DeleteEventAsync(_eventViewModel))
+            {
+          
+                navigationManager.NavigateTo("/org/events", true);
+            }
+            else
+            {
+                errorMessage = "Etkinlik silinirken bir hata oluştu. Lütfen tekrar deneyin.";
+            }
+          
+        });
+
+    }
+}

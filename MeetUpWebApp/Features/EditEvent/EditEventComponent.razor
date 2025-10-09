@@ -1,0 +1,78 @@
+﻿@page "/org/events/edit/{eventId:int}"
+@inject EditEventService _editEventService
+@inject NavigationManager navigationManager
+@inherits BaseComponent
+@attribute [Authorize(policy: "OrganizerOnly")]
+<div class="container my-4">
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h3 class="mb-0">Etkinliği Düzenle</h3>
+        </div>
+
+        <div class="card-body">
+            @if(_eventViewModel is not null)
+            {
+                <AddUpdateEventComponent _eventViewModel="@_eventViewModel" OnSaved="UpdateEvent" errorMessage="@errorMessage">
+
+                    <errorMessageFragment>
+                        <ErrorMessageComponent ErrorMessage="@errorMessage" />
+                    </errorMessageFragment>
+
+                </AddUpdateEventComponent>
+                <hr />
+                <LeaveEventCommentsComponent eventViewModel="this._eventViewModel" />
+
+            }
+            else
+            {
+                <ErrorMessageComponent ErrorMessage="Etkinlik bulunamadı." />
+            }
+
+        </div>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public int eventId { get; set; }
+
+  
+    private EventViewModel? _eventViewModel;
+
+  
+    private string? errorMessage = string.Empty;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _eventViewModel = await _editEventService.GetEventByIdAsync(eventId);
+            ValidateCreator();
+            StateHasChanged();
+        }
+    }
+
+    private async Task UpdateEvent()
+    {
+        errorMessage = _eventViewModel?.Validate();
+        if (!string.IsNullOrWhiteSpace(errorMessage))
+        {
+            return;
+        }
+        await _editEventService.UpdateEventAsync(_eventViewModel);
+        StateHasChanged();
+        navigationManager.NavigateTo("/org/events");
+
+    }
+
+    private void ValidateCreator()
+    {
+        if( _eventViewModel?.OrganizerId.ToString() != base.UserId)
+        {
+            navigationManager.NavigateTo("/Account/AccessDenied", true);
+        }
+    }
+
+    
+}

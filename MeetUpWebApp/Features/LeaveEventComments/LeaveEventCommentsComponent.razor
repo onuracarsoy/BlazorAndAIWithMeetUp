@@ -1,0 +1,86 @@
+﻿@inject LeaveEventCommentsService leaveEventCommentsService
+@inherits BaseComponent
+@inject NavigationManager NavigationManager
+
+<h4>Yorumlar</h4>
+
+@if (this.comments is not null && this.comments.Count > 0)
+{
+    <div class="container mt-4">
+
+        @if (comments is not null)
+        {
+            foreach (var item in comments)
+            {
+                <div class="card mb-3" @key="item.CommentId">
+                    <div class="card-body">
+                        <p class="card-title">@item.UserName</p>
+                        <p class="card-subtitle text-muted">@item.PostedOn.ToString("g")</p>
+                        <p class="card-text">@item.Message</p>
+                    </div>
+                </div>
+            }
+        }
+
+    </div>
+}
+else
+{
+    <p class="text-muted"> Bu etkinliğe henüz yorum yapılmamış.</p>
+}
+
+@if (base.IsAuthenticated)
+{
+    <div class="container mt-4">
+        <h6>Yorum Yap</h6>
+        <div class="card p-3">
+            <div class="mb-3">
+                <label for="comment" class="form-label">Yorumunuz</label>
+                <textarea rows="5" id="message" class="form-control" @bind="@newComment.Message" />
+            </div>
+            <button class="btn btn-primary" @onclick="SubmitCommentAsync">Gönder</button>
+        </div>
+
+    </div>
+}
+
+
+@code {
+    [Parameter]
+    public EventViewModel? eventViewModel { get; set; }
+
+    protected override bool ShouldClearSectionContent => false;
+
+    private CommentViewModel newComment = new CommentViewModel();
+
+    private List<CommentViewModel> comments;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadComment();
+    }
+
+
+    private async Task SubmitCommentAsync()
+    {
+        if (string.IsNullOrWhiteSpace(newComment.Message))
+        {
+            return;
+        }
+
+        newComment.EventId = eventViewModel.EventId;
+        newComment.UserName = base.UserName + ((base.UserId == eventViewModel.OrganizerId.ToString()) ? " (Organizatör)" : "");
+        newComment.PostedOn = DateTime.Now;
+        await leaveEventCommentsService.AddCommentAsync(newComment);
+        newComment = new CommentViewModel();
+
+        await LoadComment();
+    }
+
+    private async Task LoadComment()
+    {
+        comments = await leaveEventCommentsService.GetCommentsByEventIdAsync(eventViewModel.EventId);
+    }
+
+   
+}
