@@ -14,6 +14,8 @@
 
 • Organizatör olup etkinlik CRUD işlemleri
 
+• Etkinlik hakkında yorum yapabilme.
+
 • Blazor özelliklerini kullanarak yazılmış alert boxlar.
 
 ## 🛠️ Kullanılan Teknolojiler
