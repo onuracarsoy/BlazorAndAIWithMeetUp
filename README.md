@@ -1,56 +1,139 @@
 # 🎉 MeetUp Web App
 
-Blazor Server ile geliştirilmiş modern etkinlik yönetim platformu.
+Modern ve kullanıcı dostu bir etkinlik yönetim platformu. Blazor Server ile geliştirilmiş, Google Authentication entegrasyonlu ve AI destekli bir web uygulaması.
 
 ## ✨ Özellikler
 
-- 🔐 Google Authentication ile giriş
-- 🎯 Etkinlik oluşturma, düzenleme, silme
-- 🔍 Etkinlik keşfi ve RSVP sistemi
-- 🤖 Azure OpenAI ile AI chatbot
-- 💬 Etkinlik yorumları ve organizatör değerlendirme
-- 👥 Rol tabanlı yetkilendirme (Kullanıcı/Organizatör)
+### 🎯 Temel Özellikler
+- **Etkinlik Oluşturma**: Organizatörler kolayca etkinlik oluşturabilir
+- **Etkinlik Keşfetme**: Kategorilere göre etkinlikleri keşfedin
+- **RSVP Sistemi**: Etkinliklere katılım bildirimi
+- **Yorum Sistemi**: Etkinlikler hakkında görüşlerinizi paylaşın
+- **Değerlendirme Sistemi**: Organizatörleri değerlendirin
 
-## 🛠️ Teknolojiler
+### 🔐 Güvenlik ve Kimlik Doğrulama
+- **Google Authentication**: Tek tıkla giriş yapın
+- **Rol Tabanlı Yetkilendirme**: Organizatör ve kullanıcı rolleri
+- **Güvenli Veri Erişimi**: Kullanıcılar sadece kendi verilerine erişebilir
 
-- **.NET 9.0** & **Blazor Server**
-- **Entity Framework Core** & **SQL Server**
-- **Azure OpenAI** & **Google Authentication**
-- **Vertical Slice Architecture**
+### 🤖 AI Destekli Özellikler
+- **AI ChatBot**: Azure OpenAI entegrasyonu ile akıllı asistan
+- **Akıllı Öneriler**: Etkinlik önerileri ve yardım
+
+### 📱 Modern UI/UX
+- **Responsive Tasarım**: Tüm cihazlarda mükemmel görünüm
+- **Interactive Components**: Blazor Server ile dinamik kullanıcı deneyimi
+- **Modern CSS**: Güncel tasarım trendleri
+
+## 🛠️ Teknoloji Stack
+
+- **Frontend**: Blazor Server (.NET 9.0)
+- **Backend**: ASP.NET Core Web API
+- **Veritabanı**: SQL Server + Entity Framework Core
+- **Kimlik Doğrulama**: Google OAuth 2.0
+- **AI**: Azure OpenAI
+- **Mapping**: AutoMapper
+- **Image Processing**: SixLabors.ImageSharp
 
 ## 🚀 Kurulum
 
-1. Projeyi klonlayın
-```bash
-git clone https://github.com/kullaniciadi/MeetUpWebApp.git
-cd MeetUpWebApp
-```
+### Gereksinimler
+- .NET 9.0 SDK
+- SQL Server
+- Google OAuth Credentials
+- Azure OpenAI API Key
 
-2. Paketleri yükleyin ve veritabanını oluşturun
-```bash
-dotnet restore
-dotnet ef database update
-```
+### Adımlar
 
-3. `appsettings.json` dosyasında gerekli konfigürasyonları yapın:
-   - Veritabanı bağlantı stringi
-   - Google OAuth bilgileri
-   - Azure OpenAI API bilgileri
+1. **Projeyi klonlayın**
+   ```bash
+   git clone https://github.com/yourusername/MeetUpWebApp.git
+   cd MeetUpWebApp
+   ```
 
-4. Uygulamayı çalıştırın
-```bash
-dotnet run
-```
+2. **Bağımlılıkları yükleyin**
+   ```bash
+   dotnet restore
+   ```
+
+3. **Veritabanını yapılandırın**
+   - `appsettings.json` dosyasında connection string'i güncelleyin
+   - Migration'ları çalıştırın:
+   ```bash
+   dotnet ef database update
+   ```
+
+4. **Google OAuth ayarlarını yapılandırın**
+   - `appsettings.json` dosyasında Google ClientId ve ClientSecret'i ekleyin
+   ```json
+   {
+     "Google": {
+       "ClientId": "your-client-id",
+       "ClientSecret": "your-client-secret"
+     }
+   }
+   ```
+
+5. **Azure OpenAI ayarlarını yapılandırın**
+   - Azure OpenAI API anahtarınızı ekleyin
+
+6. **Uygulamayı çalıştırın**
+   ```bash
+   dotnet run
+   ```
+
 ## 📁 Proje Yapısı
 
-## 🔧 Konfigürasyon
+```
+MeetUpWebApp/
+├── Data/                    # Veritabanı ve Entity modelleri
+│   ├── ApplicationDbContext.cs
+│   └── Entities/
+├── Features/                # Özellik bazlı modüler yapı
+│   ├── AIChatBot/          # AI ChatBot özelliği
+│   ├── CreateEvent/        # Etkinlik oluşturma
+│   ├── DiscoverEvents/    # Etkinlik keşfetme
+│   ├── RSVPEvent/         # RSVP işlemleri
+│   └── ...
+├── Shared/                 # Paylaşılan bileşenler ve servisler
+│   ├── Components/        # Yeniden kullanılabilir bileşenler
+│   ├── Services/          # Paylaşılan servisler
+│   └── ViewModels/        # Veri transfer nesneleri
+└── wwwroot/               # Statik dosyalar
+```
 
-- **Google Auth**: [Google Cloud Console](https://console.cloud.google.com/)
-- **Azure AI**: [Azure AI Studio](https://azure.microsoft.com/en-us/products/ai-foundry)
+## 🎨 Özellik Detayları
+
+### Etkinlik Yönetimi
+- Etkinlik oluşturma, düzenleme ve silme
+- Kategori bazlı filtreleme (Yüz yüze/Online)
+- Kapasite yönetimi
+- Bilet fiyatlandırması
+- İade politikası
+
+### Kullanıcı Deneyimi
+- Google ile tek tıkla giriş
+- Kişisel etkinlik geçmişi
+- RSVP yönetimi
+- Organizatör değerlendirmeleri
+
+### AI Entegrasyonu
+- Akıllı chatbot asistanı
+- Etkinlik önerileri
+- Kullanıcı desteği
+
+### Veritabanı Değişiklikleri
+```bash
+# Yeni migration oluşturma
+dotnet ef migrations add MigrationName
+
+# Migration'ı veritabanına uygulama
+dotnet ef database update
+```
+## 📞 İletişim
+
+Proje hakkında sorularınız için issue açabilir veya iletişime geçebilirsiniz.
 
 ---
 
-⭐ Beğendiyseniz yıldız vermeyi unutmayın!
-
-
-
+⭐ Bu projeyi beğendiyseniz yıldız vermeyi unutmayın!
