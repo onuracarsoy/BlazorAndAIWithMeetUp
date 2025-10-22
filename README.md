@@ -1,43 +1,56 @@
-## 📌 Proje Özeti
+# 🎉 MeetUp Web App
 
-...
+Blazor Server ile geliştirilmiş modern etkinlik yönetim platformu.
 
 ## ✨ Özellikler
 
-• Komponent bazlı interaktif yapı (sayfa/komponent bazlı)
+- 🔐 Google Authentication ile giriş
+- 🎯 Etkinlik oluşturma, düzenleme, silme
+- 🔍 Etkinlik keşfi ve RSVP sistemi
+- 🤖 Azure OpenAI ile AI chatbot
+- 💬 Etkinlik yorumları ve organizatör değerlendirme
+- 👥 Rol tabanlı yetkilendirme (Kullanıcı/Organizatör)
 
-• EtkinLink Chatbotu ile etkinlik fikirleri alabilme
+## 🛠️ Teknolojiler
 
-• Google Authentication ile giriş yapma
+- **.NET 9.0** & **Blazor Server**
+- **Entity Framework Core** & **SQL Server**
+- **Azure OpenAI** & **Google Authentication**
+- **Vertical Slice Architecture**
 
-• Organizatörü değerlendirebilme
+## 🚀 Kurulum
 
-• Organizatör olup etkinlik CRUD işlemleri
+1. Projeyi klonlayın
+```bash
+git clone https://github.com/kullaniciadi/MeetUpWebApp.git
+cd MeetUpWebApp
+```
 
-• Etkinlik hakkında yorum yapabilme.
+2. Paketleri yükleyin ve veritabanını oluşturun
+```bash
+dotnet restore
+dotnet ef database update
+```
 
-• Blazor özelliklerini kullanarak yazılmış alert boxlar.
+3. `appsettings.json` dosyasında gerekli konfigürasyonları yapın:
+   - Veritabanı bağlantı stringi
+   - Google OAuth bilgileri
+   - Azure OpenAI API bilgileri
 
-## 🛠️ Kullanılan Teknolojiler
+4. Uygulamayı çalıştırın
+```bash
+dotnet run
+```
+## 📁 Proje Yapısı
 
-• Blazor Server (.NET 9.0)
+## 🔧 Konfigürasyon
 
-• Azure Artificial Intelligence
+- **Google Auth**: [Google Cloud Console](https://console.cloud.google.com/)
+- **Azure AI**: [Azure AI Studio](https://azure.microsoft.com/en-us/products/ai-foundry)
 
-• Google Authentication
+---
 
-• Vertical Slice Architecture
+⭐ Beğendiyseniz yıldız vermeyi unutmayın!
 
-• Entity Framework Core
 
-• Google Authentication
 
-• AutoMapper
-
-## 🚀 Başlangıç / Kurulum
-Projeyi klonladıkdan ve migration işlemlerinden sonra appsetting.json  ve secret.json kısımlarında ki endpoint ve keyleri koymanız gerekmektedir.
-<br/>
-Endpoint ve keyler için;
-<br/>
-Google Auth: https://console.cloud.google.com/
-Azure AI : https://azure.microsoft.com/en-us/products/ai-foundry
