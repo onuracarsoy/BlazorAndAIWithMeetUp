@@ -130,10 +130,3 @@ dotnet ef migrations add MigrationName
 # Migration'ı veritabanına uygulama
 dotnet ef database update
 ```
-## 📞 İletişim
-
-Proje hakkında sorularınız için issue açabilir veya iletişime geçebilirsiniz.
-
----
-
-⭐ Bu projeyi beğendiyseniz yıldız vermeyi unutmayın!
